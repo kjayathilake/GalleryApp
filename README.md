@@ -1,1 +1,1 @@
-# GalleryApp
+# GallaryApp
