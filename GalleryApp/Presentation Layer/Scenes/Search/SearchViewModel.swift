@@ -11,100 +11,119 @@ import RxCocoa
 final class SearchViewModel: ViewModelType {
 
     struct Input {
-        let search: Driver<String>
-        let more: Signal<Void>
-        let selected: Signal<PhotoViewModel>
+        let search: AnyObserver<String>
+        let more: AnyObserver<Void>
+        let selectItem: AnyObserver<PhotoViewModel>
     }
 
     struct Output {
         let results: Driver<[PhotoViewModel]>
-        let selected: Signal<Void>
+        let selectedItem: Driver<PhotoViewModel>
+        let error: Driver<String?>
     }
     
     struct Dependencies {
-        let api: PhotosAPI
+        let service: PhotosAPI
         let coordinator: SearchCoordinatorType
     }
+    
+    private(set) var input: Input!
+    private(set) var output: Output!
+    
+    private let search = PublishSubject<String>()
+    private let more = PublishSubject<Void>()
+    private let selectItem = PublishSubject<PhotoViewModel>()
+    private let onError = PublishSubject<Error>()
     
     private let dependencies: Dependencies
     private let count = 30
     private var page = 1
-    private var hasMore = true
+    private var pageCount = 1
+    private var shouldAppend: Bool = false
     private var searchtext = ""
     private var photos: [PhotoViewModel] = []
     
     init(dependencies: Dependencies) {
         self.dependencies = dependencies
+        
+        self.input = Input(
+            search: search.asObserver(),
+            more: more.asObserver(),
+            selectItem: selectItem.asObserver()
+        )
+        
+        self.output = Output(
+            results: results(),
+            selectedItem: selectedItem(),
+            error: error()
+        )
     }
     
-    func transform(input: Input) -> Output {
+    private func results() -> Driver<[PhotoViewModel]> {
         
-        let searchResults = input
-            .search
+        let search = self.search
             .distinctUntilChanged()
-            .debounce(.milliseconds(300))
+            .debounce(.milliseconds(300), scheduler: MainScheduler())
             .filter({ text in
                 !text.isEmpty
             })
-            .asObservable()
             .do(onNext: { text in
-                self.searchtext = text
+                self.shouldAppend = false
                 self.page = 1
-                self.hasMore = true
-                print("x text: \(text)")
-            })
-            .flatMap { text in
-                self.dependencies.api.searchPhotos(query: text, pageNumber: self.page, perPage: self.count)
-            }
-            .map { $0.results.map { PhotoViewModel(photo: $0) } }
-            .do(onNext: { result in
-                if result.count < self.count {
-                    self.hasMore = false
-                }
-                self.photos = result
-                print("x a count: \(result.count)")
+                self.pageCount = 1
+                self.searchtext = text
             })
             .share()
         
-        let loadMore = input
-            .more
-            .asObservable()
-            .skip(1)
-            .filter({ text in
-                !self.searchtext.isEmpty
-            })
-            .filter({ self.hasMore })
+        let loadMore = self.more
+            .filter({ self.page < self.pageCount - 1 })
             .do(onNext: {
+                self.shouldAppend = true
                 self.page += 1
-                print("x page: \(self.page)")
             })
-            .flatMap { _ in
-                self.dependencies.api.searchPhotos(query: self.searchtext, pageNumber: self.page, perPage: self.count)
-            }
-            .map { $0.results.map { PhotoViewModel(photo: $0) } }
-            .map { self.photos + $0 }
-            .do(onNext: { result in
-                if result.count < self.count {
-                    self.hasMore = false
-                }
-                self.photos = result
-                print("x s count: \(result.count)")
-            })
+            .map({ self.searchtext })
             .share()
         
-        let mappedResults = Observable
-            .merge(searchResults, loadMore)
-            .asDriver(onErrorJustReturn: [])
-
-        let selected = input
-            .selected
-            .asObservable()
+        return Observable
+                .merge(search, loadMore)
+                .flatMap { text in
+                    self.dependencies.service.searchPhotos(query: text, pageNumber: self.page, perPage: self.count)
+                        .catch { error -> Single<UnsplashSearchResponse> in
+                            self.onError.onNext(error)
+                            return .never()
+                        }
+                }
+                .do(onNext: { result in
+                    self.page = result.total
+                    self.pageCount = result.totalPages
+                })
+                .map { $0.results.map { PhotoViewModel(photo: $0) } }
+                .map { result -> [PhotoViewModel] in
+                    var photos: [PhotoViewModel] = result
+                    if self.shouldAppend {
+                        self.shouldAppend = false
+                        photos = self.photos + result
+                    }
+                    self.photos = photos
+                    return photos
+                }
+                .asDriver(onErrorJustReturn: [])
+    }
+    
+    private func selectedItem() -> Driver<PhotoViewModel> {
+        
+        return self.selectItem
             .do(onNext: { model in
                 self.dependencies.coordinator.navigateToDetailScreen(photoId: model.id)
             })
-            .map { _ in () }
-            .asSignal(onErrorJustReturn: ())
-        
-        return Output(results: mappedResults, selected: selected)
+            .asDriver(onErrorJustReturn: PhotoViewModel())
+    }
+    
+    private func error() -> Driver<String?> {
+        return self.onError
+            .map { error -> String in
+                return (error as! CustomError).description
+            }
+            .asDriver(onErrorJustReturn: CustomError.unknown.description)
     }
 }

@@ -35,8 +35,9 @@ class SearchViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupUI()
-        bindViewModel()
+        self.setupUI()
+        self.bindViewModelInputs()
+        self.bindViewModelOutputs()
     }
 }
 
@@ -76,30 +77,53 @@ private extension SearchViewController {
         return layout
     }
     
-    /// Bind View Model
-    func bindViewModel() {
+    func bindViewModelInputs() {
         
-        let input = SearchViewModel.Input(
-            search: searchController.searchBar.rx.text.orEmpty.asDriver(),
-            more: collectionView.rx.reachedBottom().asSignal(),
-            selected: collectionView.rx.modelSelected(PhotoViewModel.self).asSignal()
-        )
+        self.searchController.searchBar.rx.text.orEmpty
+            .bind(to: self.viewModel.input.search)
+            .disposed(by: rx.disposeBag)
+
+        self.collectionView.rx.reachedBottom()
+            .bind(to: self.viewModel.input.more)
+            .disposed(by: rx.disposeBag)
         
-        let output = viewModel.transform(input: input)
-        
-        output.results
+        self.collectionView.rx.modelSelected(PhotoViewModel.self)
+            .bind(to: self.viewModel.input.selectItem)
+            .disposed(by: rx.disposeBag)
+    }
+    
+    func bindViewModelOutputs() {
+        self.viewModel.output.results
             .drive(
                 collectionView.rx.items(
                     cellIdentifier: PhotoCell.reuseIdentifier, cellType: PhotoCell.self
                 )
-            ) { tableView, viewModel, cell in
+            ) { row, viewModel, cell in
                 cell.bind(to: viewModel)
             }
             .disposed(by: rx.disposeBag)
         
-        output.selected
-            .emit()
+        self.viewModel.output.selectedItem
+            .drive()
             .disposed(by: rx.disposeBag)
+        
+        self.viewModel.output.error
+            .drive(onNext: { message in
+                if message != nil {
+                    self.showErrorMessage(message: message!)
+                }
+            })
+            .disposed(by: rx.disposeBag)
+    }
+    
+    func showErrorMessage(message: String) {
+                
+        let alert = UIAlertController(title: kError.localized, message: message, preferredStyle: .alert)
+        let action = UIAlertAction(title: kOK.localized, style: .default) { _ in
+            alert.dismiss(animated: true, completion: nil)
+        }
+        alert.addAction(action)
+        self.present(alert, animated: true, completion: nil)
     }
 
 }

@@ -27,10 +27,10 @@ class HomeViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupUI()
-        //bindCollectionView()
-        bindViewModel()
-        ready.accept(())
+        self.setupUI()
+        self.bindViewModelInputs()
+        self.bindViewModelOutputs()
+        self.ready.accept(())
     }
 }
 
@@ -72,44 +72,56 @@ private extension HomeViewController {
         return layout
     }
     
-    func bindCollectionView() {
-        collectionView.rx.willDisplayCell
-            .filter { $0.cell.isKind(of: PhotoCell.self) }
-            .map { ($0.cell as! PhotoCell, $0.at.item)}
-            .subscribe(onNext: { (cell, index) in
-                cell.imageView.image = nil
-            })
+    func bindViewModelInputs() {
+        self.ready
+            .bind(to: self.viewModel.input.ready)
             .disposed(by: rx.disposeBag)
         
+        self.refreshHandler.refresh
+            .bind(to: self.viewModel.input.reload)
+            .disposed(by: rx.disposeBag)
         
+        self.collectionView.rx.reachedBottom()
+            .bind(to: self.viewModel.input.more)
+            .disposed(by: rx.disposeBag)
+        
+        self.collectionView.rx.modelSelected(PhotoViewModel.self)
+            .bind(to: self.viewModel.input.selectItem)
+            .disposed(by: rx.disposeBag)
     }
     
-    /// Bind View Model
-    func bindViewModel() {
-        
-        let input = HomeViewModel.Input(
-            ready: ready.asSignal(),
-            reload: refreshHandler.refresh.asSignal(),
-            more: collectionView.rx.reachedBottom().asSignal(),
-            selected: collectionView.rx.modelSelected(PhotoViewModel.self).asSignal()
-        )
-        
-        let output = viewModel.transform(input: input)
-        
-        output.results
+    func bindViewModelOutputs() {
+        self.viewModel.output.results
             .do(onNext: { _ in self.refreshHandler.end() })
             .drive(
                 collectionView.rx.items(
                     cellIdentifier: PhotoCell.reuseIdentifier, cellType: PhotoCell.self
                 )
-            ) { tableView, viewModel, cell in
+            ) { row, viewModel, cell in
                 cell.bind(to: viewModel)
             }
             .disposed(by: rx.disposeBag)
         
-        output.selected
-            .emit()
+        self.viewModel.output.selectedItem
+            .drive()
+            .disposed(by: rx.disposeBag)
+        
+        self.viewModel.output.error
+            .drive(onNext: { message in
+                if message != nil {
+                    self.showErrorMessage(message: message!)
+                }
+            })
             .disposed(by: rx.disposeBag)
     }
-
+    
+    func showErrorMessage(message: String) {
+                
+        let alert = UIAlertController(title: kError.localized, message: message, preferredStyle: .alert)
+        let action = UIAlertAction(title: kOK.localized, style: .default) { _ in
+            alert.dismiss(animated: true, completion: nil)
+        }
+        alert.addAction(action)
+        self.present(alert, animated: true, completion: nil)
+    }
 }

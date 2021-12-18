@@ -16,11 +16,14 @@ import NSObject_Rx
 class DetailViewController: UIViewController {
     
     var viewModel: DetailViewModel!
+    var ready: PublishRelay = PublishRelay<Void>()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
-        bindViewModel()
+        self.bindViewModelInputs()
+        self.bindViewModelOutputs()
+        self.ready.accept(())
     }
     
     // MARK: - Properties
@@ -323,14 +326,14 @@ private extension DetailViewController {
         }
     }
     
-    func bindViewModel() {
-        let input = DetailViewModel.Input(
-            ready: rx.viewWillAppear.asSignal()
-        )
-        
-        let output = viewModel.transform(input: input)
-        
-        output.result
+    func bindViewModelInputs() {
+        self.ready
+            .bind(to: self.viewModel.input.ready)
+            .disposed(by: rx.disposeBag)
+    }
+    
+    func bindViewModelOutputs() {
+        self.viewModel.output.result
             .drive(onNext: { [weak self] data in
                 guard let data = data,
                       let disposeBag = self?.rx.disposeBag else { return }
@@ -394,5 +397,22 @@ private extension DetailViewController {
             })
             .disposed(by: rx.disposeBag)
         
+        self.viewModel.output.error
+            .drive(onNext: { message in
+                if message != nil {
+                    self.showErrorMessage(message: message!)
+                }
+            })
+            .disposed(by: rx.disposeBag)
+    }
+    
+    func showErrorMessage(message: String) {
+                
+        let alert = UIAlertController(title: kError.localized, message: message, preferredStyle: .alert)
+        let action = UIAlertAction(title: kOK.localized, style: .default) { _ in
+            alert.dismiss(animated: true, completion: nil)
+        }
+        alert.addAction(action)
+        self.present(alert, animated: true, completion: nil)
     }
 }

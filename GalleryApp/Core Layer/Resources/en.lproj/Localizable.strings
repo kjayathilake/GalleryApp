@@ -1,0 +1,13 @@
+/* 
+  Localizable.strings
+  GalleryApp
+
+  Created by Krishantha Jayathilake on 2021-12-18.
+  
+*/
+
+"generic_error" = "Oops.. Something went wrong!";
+"pull_to_refresh" = "Pull to refresh";
+"refreshing" = "Refreshing...";
+"ok" = "OK";
+"error" = "Error";

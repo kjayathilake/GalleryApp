@@ -48,6 +48,9 @@
 		69F1656B2740EAD400550732 /* SearchCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69F1656A2740EAD400550732 /* SearchCoordinator.swift */; };
 		69F1656D2740EB4D00550732 /* SearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69F1656C2740EB4D00550732 /* SearchViewController.swift */; };
 		69F1656F2740EB5800550732 /* SearchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69F1656E2740EB5800550732 /* SearchViewModel.swift */; };
+		69F577F3276DAFE20083EF58 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69F577F2276DAFE20083EF58 /* Constants.swift */; };
+		69F577F6276DB0100083EF58 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 69F577F8276DB0100083EF58 /* Localizable.strings */; };
+		69F577FA276DB06F0083EF58 /* String+App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69F577F9276DB06F0083EF58 /* String+App.swift */; };
 		69FB26C1273AA195004BCE58 /* RefreshHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69FB26C0273AA195004BCE58 /* RefreshHandler.swift */; };
 		F3B0F5C0C8D167EF072A917C /* Pods_GalleryAppTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 42FAA6BA28FC97A5559BC6AC /* Pods_GalleryAppTests.framework */; };
 /* End PBXBuildFile section */
@@ -121,6 +124,9 @@
 		69F1656A2740EAD400550732 /* SearchCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchCoordinator.swift; sourceTree = "<group>"; };
 		69F1656C2740EB4D00550732 /* SearchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchViewController.swift; sourceTree = "<group>"; };
 		69F1656E2740EB5800550732 /* SearchViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchViewModel.swift; sourceTree = "<group>"; };
+		69F577F2276DAFE20083EF58 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
+		69F577F7276DB0100083EF58 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		69F577F9276DB06F0083EF58 /* String+App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+App.swift"; sourceTree = "<group>"; };
 		69FB26C0273AA195004BCE58 /* RefreshHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RefreshHandler.swift; sourceTree = "<group>"; };
 		72DE7360341E606CF5372ECE /* Pods-GalleryAppTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GalleryAppTests.debug.xcconfig"; path = "Target Support Files/Pods-GalleryAppTests/Pods-GalleryAppTests.debug.xcconfig"; sourceTree = "<group>"; };
 		A27DE5D3D3FEAE0E19287F9F /* Pods_GalleryApp_GalleryAppUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_GalleryApp_GalleryAppUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -189,6 +195,7 @@
 				699F1DBD2734FEEE00606BD7 /* UICell+App.swift */,
 				6983C66D273B529C008CD1D1 /* UIColor+App.swift */,
 				6983C66F273B5BF2008CD1D1 /* RxSwift+App.swift */,
+				69F577F9276DB06F0083EF58 /* String+App.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -299,6 +306,7 @@
 			isa = PBXGroup;
 			children = (
 				69A09E3A2733C242007ACE78 /* Assets.xcassets */,
+				69F577F8276DB0100083EF58 /* Localizable.strings */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -313,6 +321,7 @@
 				69FB26C0273AA195004BCE58 /* RefreshHandler.swift */,
 				6983C672273B934F008CD1D1 /* UIScrollView+Rx.swift */,
 				69F165682740E79400550732 /* PublicVariables.swift */,
+				69F577F2276DAFE20083EF58 /* Constants.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -558,6 +567,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				69A09E3E2733C242007ACE78 /* LaunchScreen.storyboard in Resources */,
+				69F577F6276DB0100083EF58 /* Localizable.strings in Resources */,
 				69A09E3B2733C242007ACE78 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -729,6 +739,7 @@
 				69F165692740E79400550732 /* PublicVariables.swift in Sources */,
 				69A09E962733C4B4007ACE78 /* NetworkError.swift in Sources */,
 				699F1DBE2734FEEE00606BD7 /* UICell+App.swift in Sources */,
+				69F577FA276DB06F0083EF58 /* String+App.swift in Sources */,
 				6940738E2735A28400F898CD /* BlurHashEncode.swift in Sources */,
 				69F165632740952100550732 /* Coordinator.swift in Sources */,
 				6983C670273B5BF2008CD1D1 /* RxSwift+App.swift in Sources */,
@@ -738,6 +749,7 @@
 				69A09EFC2734045C007ACE78 /* PhotosHTTPService.swift in Sources */,
 				694073922737B2B700F898CD /* ViewModelType.swift in Sources */,
 				69F1656B2740EAD400550732 /* SearchCoordinator.swift in Sources */,
+				69F577F3276DAFE20083EF58 /* Constants.swift in Sources */,
 				6983C679273BBBAA008CD1D1 /* DetailViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -780,6 +792,14 @@
 				69A09E3D2733C242007ACE78 /* Base */,
 			);
 			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+		69F577F8276DB0100083EF58 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				69F577F7276DB0100083EF58 /* en */,
+			);
+			name = Localizable.strings;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */

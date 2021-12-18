@@ -22,7 +22,7 @@ final class HomeCoordinator: CoordinatorType {
     func start() {
         let homeViewController = HomeViewController()
         let homeViewModel = HomeViewModel(
-            dependencies: HomeViewModel.Dependencies(api: PhotosService(), coordinator: self)
+            dependencies: HomeViewModel.Dependencies(service: PhotosService(), coordinator: self)
         )
         homeViewController.viewModel = homeViewModel
         navigationController.viewControllers = [homeViewController]

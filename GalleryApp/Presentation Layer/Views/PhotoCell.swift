@@ -186,10 +186,21 @@ struct PhotoViewModel {
         self.id = photo.id
         self.name = photo.user.name
         self.likes = photo.likes
-        self.blurHash = photo.blurHash
+        self.blurHash = photo.blurHash ?? ""
         self.mainImageURL = photo.urls.regular
         self.profileImageURL = photo.user.profileImage.small
         self.isLikedByUser = photo.likedByUser
-        self.color = photo.color
+        self.color = photo.color ?? ""
+    }
+    
+    init() {
+        self.id = ""
+        self.name = ""
+        self.likes = 0
+        self.blurHash = ""
+        self.mainImageURL = ""
+        self.profileImageURL = ""
+        self.isLikedByUser = false
+        self.color = ""
     }
 }

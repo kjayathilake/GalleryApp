@@ -23,7 +23,7 @@ final class DetailCoordinator: CoordinatorType {
     
     func start() {
         let detailViewModel = DetailViewModel(
-            dependencies: DetailViewModel.Dependencies(photoId: self.photoId, api: PhotosService(), coordinator: self)
+            dependencies: DetailViewModel.Dependencies(photoId: self.photoId, service: PhotosService(), coordinator: self)
         )
         let detailViewController = DetailViewController()
         detailViewController.viewModel = detailViewModel

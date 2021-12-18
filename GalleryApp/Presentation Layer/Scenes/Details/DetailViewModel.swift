@@ -11,39 +11,63 @@ import RxCocoa
 final class DetailViewModel: ViewModelType {
     
     struct Input {
-        let ready: Signal<Void>
+        let ready: AnyObserver<Void>
     }
 
     struct Output {
         let result: Driver<PhotoDetailViewModel?>
+        let error: Driver<String?>
     }
     
     struct Dependencies {
         let photoId: String
-        let api: PhotosAPI
+        let service: PhotosAPI
         let coordinator: DetailCoordinatorType
     }
+    
+    private(set) var input: Input!
+    private(set) var output: Output!
+    
+    private let ready = PublishSubject<Void>()
+    private let onError = PublishSubject<Error>()
     
     private let dependencies: Dependencies
     
     init(dependencies: Dependencies) {
         self.dependencies = dependencies
+        
+        self.input = Input(
+            ready: ready.asObserver()
+        )
+        
+        self.output = Output(
+            result: result(),
+            error: error()
+        )
     }
     
-    func transform(input: Input) -> Output {
-                
-        let result =  input
-            .ready
-            .asObservable()
+    private func result() -> Driver<PhotoDetailViewModel?> {
+        
+        return self.ready
             .flatMap { _ in
-                self.dependencies.api.fetchPhoto(id: self.dependencies.photoId)
+                self.dependencies.service.fetchPhoto(id: self.dependencies.photoId)
+                    .catch { error -> Single<Photo> in
+                        self.onError.onNext(error)
+                        return .never()
+                    }
             }
             .map { photo -> PhotoDetailViewModel? in
                 return PhotoDetailViewModel(photo: photo)
             }
             .asDriver(onErrorJustReturn: nil)
-        
-        return Output(result: result)
+    }
+
+    private func error() -> Driver<String?> {
+        return self.onError
+            .map { error -> String in
+                return (error as! CustomError).description
+            }
+            .asDriver(onErrorJustReturn: CustomError.unknown.description)
     }
 }
 

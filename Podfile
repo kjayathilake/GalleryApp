@@ -11,8 +11,6 @@ target 'GalleryApp' do
   pod 'lottie-ios'
   pod 'SnapKit'
   pod 'Alamofire'
-  pod 'SnapKit'
-  pod 'lottie-ios'
   pod 'NSObject+Rx' # https://github.com/RxSwiftCommunity/NSObject-Rx
   pod 'RxNuke' # https://github.com/kean/RxNuke
 

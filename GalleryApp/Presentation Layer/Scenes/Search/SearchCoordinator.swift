@@ -22,7 +22,7 @@ final class SearchCoordinator: CoordinatorType {
     func start() {
         let searchViewController = SearchViewController()
         let searchViewModel = SearchViewModel(
-            dependencies: SearchViewModel.Dependencies(api: PhotosService(), coordinator: self)
+            dependencies: SearchViewModel.Dependencies(service: PhotosService(), coordinator: self)
         )
         searchViewController.viewModel = searchViewModel
         navigationController.viewControllers = [searchViewController]
