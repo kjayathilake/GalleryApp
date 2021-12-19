@@ -172,7 +172,7 @@ private extension PhotoCell {
     }
 }
 
-struct PhotoViewModel {
+struct PhotoViewModel: Equatable {
     var id: String
     var name: String
     var mainImageURL: String
@@ -202,5 +202,10 @@ struct PhotoViewModel {
         self.profileImageURL = ""
         self.isLikedByUser = false
         self.color = ""
+    }
+    
+    public static func == (lhs: PhotoViewModel, rhs: PhotoViewModel) -> Bool {
+        return lhs.id == rhs.id &&
+            lhs.name == rhs.name
     }
 }

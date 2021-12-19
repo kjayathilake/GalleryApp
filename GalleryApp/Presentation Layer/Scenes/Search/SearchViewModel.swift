@@ -62,8 +62,6 @@ final class SearchViewModel: ViewModelType {
     private func results() -> Driver<[PhotoViewModel]> {
         
         let search = self.search
-            .distinctUntilChanged()
-            .debounce(.milliseconds(300), scheduler: MainScheduler())
             .filter({ text in
                 !text.isEmpty
             })

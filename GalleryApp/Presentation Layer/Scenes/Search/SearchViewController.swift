@@ -80,6 +80,8 @@ private extension SearchViewController {
     func bindViewModelInputs() {
         
         self.searchController.searchBar.rx.text.orEmpty
+            .distinctUntilChanged()
+            .debounce(.microseconds(300), scheduler: MainScheduler.instance)
             .bind(to: self.viewModel.input.search)
             .disposed(by: rx.disposeBag)
 
